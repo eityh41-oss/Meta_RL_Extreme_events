@@ -1,0 +1,46 @@
+Clear
+
+! INSTANTIATE A NEW CIRCUIT AND DEFINE A STIFF 4160V SOURCE
+! The new circuit is called '33nodeSystem'
+New Circuit.Cir basekv=12.66  pu=1 phases=3 bus1=1 MVAsc3=20000 MVAsc1=21000
+!New Circuit.Cir  pu=1.0 basekv=12.66  bus1=sourcebus MVASC3=5000000 5000000 
+!New object=circuit.69nodeSystem
+
+~ BasekV=12.66  pu=1.0 Angle=0 R1=0.0922 X1=0.047! I have to add r and x to line 1 to give us the same results mentioned into papers
+
+
+! REDIRECT INPUT STREAM TO FILE CONTAINING DEFINITIONS OF LINECODES
+Redirect   IEEE33LineCodes.DSS
+
+! SPOT LOADS -- REDIRECT INPUT STREAM TO LOAD DEFINITIONS FILE
+Redirect IEEE33Loads.DSS
+
+
+!Power Flow Configuration
+Set Voltagebases=[12.66]
+new energymeter.meter element=Line.1 terminal=1
+!SetKVBase Bus=1 KVLL=12.66
+Calcvoltagebases
+Set Mode=Snap
+Set ControlMode=Static
+Set MaxIterations=100  ! Increase from default 15
+Solve
+
+!Post-Processing
+// Show Voltage LN Nodes
+// Show Losses
+// Show Currents
+
+// Export Voltages
+// Export Currents
+// Export Losses
+
+! After compiling and solving your model:
+
+Plot profile ph=All ! Voltage profile for all phases
+
+
+
+
+
+

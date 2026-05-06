@@ -1,0 +1,41 @@
+
+// Define the line code
+New Line.1  phases=3 Bus1=1  Bus2=2  Length=1  R=0.0922 X=0.047     units=1
+New Line.2  phases=3 Bus1=2  Bus2=3  Length=1 R=0.493   X=0.2511    units=1
+New Line.3  phases=3 Bus1=3  Bus2=4  Length=1 R=0.366   X=0.1864    units=1
+New Line.4  phases=3 Bus1=4  Bus2=5  Length=1 R=0.3811  X=0.1941    units=1
+New Line.5  phases=3 Bus1=5  Bus2=6  Length=1 R=0.819   X=0.7070    units=1
+New Line.6  phases=3 Bus1=6  Bus2=7  Length=1 R=0.1872  X=0.6188    units=1  
+New Line.7  phases=3 Bus1=7  Bus2=8  Length=1 R=0.7114  X=1.2351    units=1
+New Line.8  phases=3 Bus1=8  Bus2=9  Length=1 R=1.03    X=0.74      units=1
+New Line.9  phases=3 Bus1=9  Bus2=10 Length=1 R=1.044   X=0.74      units=1
+New Line.10 phases=3 Bus1=10 Bus2=11 Length=1 R=0.1966  X=0.065     units=1
+New Line.11 phases=3 Bus1=11 Bus2=12 Length=1 R=0.3744  X=0.1298    units=1
+New Line.12 phases=3 Bus1=12 Bus2=13 Length=1 R=1.468   X=1.155     units=1
+New Line.13 phases=3 Bus1=13 Bus2=14 Length=1 R=0.5416  X=0.7129    units=1
+New Line.14 phases=3 Bus1=14 Bus2=15 Length=1 R=0.591   X=0.526     units=1
+New Line.15 phases=3 Bus1=15 Bus2=16 Length=1 R=0.7463  X=0.545     units=1 
+New Line.16 phases=3 Bus1=16 Bus2=17 Length=1 R=1.289   X=1.721     units=1
+New Line.17 phases=3 Bus1=17 Bus2=18 Length=1 R=0.732   X=0.574     units=1
+New Line.18 phases=3 Bus1=2  Bus2=19 Length=1 R=0.164   X=0.1565    units=1
+New Line.19 phases=3 Bus1=19 Bus2=20 Length=1  R=1.5042 X=1.3554    units=1
+New Line.20 phases=3 Bus1=20 Bus2=21 Length=1 R=0.4095  X=0.4784    units=1
+New Line.21 phases=3 Bus1=21 Bus2=22 Length=1 R=0.7089  X=0.9373    units=1
+New Line.22 phases=3 Bus1=3  Bus2=23 Length=1 R=0.4512  X=0.3083    units=1
+New Line.23 phases=3 Bus1=23 Bus2=24 Length=1 R=0.898   X=0.7091    units=1
+New Line.24 phases=3 Bus1=24 Bus2=25 Length=1 R=0.896   X=0.7011    units=1
+New Line.25 phases=3 Bus1=6  Bus2=26 Length=1 R=0.203   X=0.1034    units=1
+New Line.26 phases=3 Bus1=26 Bus2=27 Length=1 R=0.2842  X=0.1447    units=1
+New Line.27 phases=3 Bus1=27 Bus2=28 Length=1 R=1.059   X=0.9337    units=1
+New Line.28 phases=3 Bus1=28 Bus2=29 Length=1 R=0.8042  X=0.7006    units=1
+New Line.29 phases=3 Bus1=29 Bus2=30 Length=1 R=0.5075  X=0.2585    units=1
+New Line.30 phases=3 Bus1=30 Bus2=31 Length=1  R=0.9744 X=0.963     units=1
+New Line.31 phases=3 Bus1=31 Bus2=32 Length=1 R=0.3105  X=0.3619    units=1
+New Line.32 phases=3 Bus1=32 Bus2=33 Length=1  R=0.341  X=0.5302    units=1
+
+
+
+
+
+
+

@@ -1,0 +1,105 @@
+\section*{Benchmark Construction Details}
+\label{app:benchmark}
+\addcontentsline{toc}{section}{Benchmark Construction Details}
+
+This appendix specifies the twenty-task composite disaster-response benchmark used in Section~V-A of the main paper. Each task is a deterministic function of a single integer index. The auxiliary data files needed to reproduce the test system are released alongside the paper\footnote{\label{fn:repo}https://github.com/eityh41-oss/Meta\_RL\_Extreme\_events}. The four dimensions $(d,\delta,\tau,\rho)$ denote travel-demand intensity, transportation-network damage, distribution-network topology faults, and renewable-generation availability. Each dimension is varied independently, so tasks remain comparable along each axis.
+
+\subsection{Task Construction}
+\label{app:tasks}
+
+\subsubsection{Task Index and the Four-Dimensional Encoding}
+\label{app:task_index}
+
+Each task is identified by a mode index $m \in \mathcal{M} \triangleq \{0,\dots,19\}$. The three deterministic dimensions are obtained from $m$ through
+\begin{equation}
+\label{eq:app_task_mapping}
+\begin{aligned}
+d(m)    &= \lfloor m/4 \rfloor + 1, \\
+\tau(m) &= m \bmod 4, \\
+\rho(m) &= m \bmod 10,
+\end{aligned}
+\end{equation}
+so that $d(m)\in\{1,\dots,5\}$, $\tau(m)\in\{0,\dots,3\}$, and $\rho(m)\in\{0,\dots,9\}$. The transportation-network disruption $\delta(m)$ is generated independently for each $m$ as defined in Section~\ref{app:delta}. The encoding sweeps the OD demand index $d$ over its five levels and the PDN topology index $\tau$ over its four levels. This yields twenty distinct $(d,\tau)$ combinations. The diurnal PV index $\rho$ cycles twice across $\mathcal{M}$, but no two tasks share the same $(d,\tau,\rho)$ triple. Tasks $m\in\{0,\dots,14\}$ form the in-distribution (IID) training split $\mathcal{M}_{\text{IID}}$. Tasks $m\in\{15,\dots,19\}$ form the out-of-distribution (OOD) held-out split $\mathcal{M}_{\text{OOD}}$, comprising the configuration $(d,\tau)=(4,3)$ at $m=15$ and the four $d=5$ configurations at $m\in\{16,\dots,19\}$.
+
+\subsubsection{OD Demand Levels}
+\label{app:demand}
+
+The five OD demand levels $d_1,\dots,d_5$ are stored as integer traveler counts per OD pair. The value $d(m)$ in~\eqref{eq:app_task_mapping} selects one level at runtime. The eight OD pairs connect the origin set $\{1,2,3,7\}$ to the destination set $\{6,10,11,12\}$ and are common to all tasks. Mean demand across the eight OD pairs varies between $28.4$ and $88.6$ travelers across the five levels. This gives a roughly threefold range on a common network topology. A diurnal multiplier modulates the base demand. It peaks near $2.28$ in the morning rush, decreases to $0.57$--$0.76$ around midday, and rises to about $2.05$ in the evening rush. The effective travel demand entering the traffic-assignment layer is the element-wise product of the selected level and this multiplier.
+
+\subsection{Disaster Scenarios}
+\label{app:scenarios}
+
+\subsubsection{Transportation-Network Disruption}
+\label{app:delta}
+
+The transportation-network disruption $\delta(m)$ is represented as a time-indexed capacity-reduction field $\sigma_{m}:\mathcal{L}\times\mathcal{T}\to(0,1]$. Here, $\mathcal{L}$ denotes the set of $\lvert\mathcal{L}\rvert = 40$ directed links, and $\mathcal{T}=\{0,\dots,11\}$ denotes the restoration horizon. For every $m\in\mathcal{M}$, an independent realization is generated according to
+\begin{equation}
+\label{eq:app_disruption_generator}
+\sigma_m(\ell,t) = \begin{cases}
+U_{m,\ell}, & (\ell,t)\in\mathcal{L}_m\times\{t_m\},\\
+1, & \text{otherwise},
+\end{cases}
+\end{equation}
+where $t_m$ is drawn uniformly from the disruption window $\{3,\dots,10\}$. The damaged link subset $\mathcal{L}_m\subseteq\mathcal{L}$ is obtained by sampling a damage ratio $\pi_m\sim\mathcal{U}(0.2,0.4)$ and selecting $\lceil\pi_m\lvert\mathcal{L}\rvert\rceil$ links uniformly without replacement. The residual-capacity multipliers $U_{m,\ell}\sim\mathcal{U}(0.2,0.4)$ are drawn independently across $\ell\in\mathcal{L}_m$. Each task contains a single localized shock. A fraction of the network is degraded for one hour and restored thereafter. This one-hour shock keeps the disruption model simple and is consistent with single-point hazard abstractions used in short-horizon distribution restoration studies. Sustained or cascading disruptions are outside the scope of this benchmark. The sampling procedure uses a fixed random seed, so the resulting disruption field is identical across training and evaluation runs.
+
+\subsubsection{Distribution-Network Topology Faults}
+\label{app:tau}
+
+The four PDN topology configurations $\tau_0,\dots,\tau_3$ correspond to distinct $N{-}k$ branch-outage scenarios on the modified IEEE 33-bus feeder. Each configuration is stored as a full branch-parameter table. At solve time, the affected branches are removed from the power-flow feasibility set by inflating their impedances above a large threshold. Configurations $\tau_0$, $\tau_1$, and $\tau_3$ are $N{-}1$ contingencies. They open one branch in the upstream lateral, a mid-feeder lateral, and a branch adjacent to a heavy-load node, respectively. Configuration $\tau_2$ is an $N{-}3$ contingency that simultaneously opens the primary tie and two laterals. The four configurations form a graded sequence in the number of unserved downstream load buses. They provide a controlled ordering from mild to severe PDN fault regimes while keeping the restored network radial in every case.
+
+\subsubsection{Photovoltaic Profiles}
+\label{app:rho}
+
+The ten PV profiles $\rho_0,\dots,\rho_9$ are daily normalized power curves obtained from a fifteen-minute irradiance record. They are downsampled to hourly resolution across the restoration horizon and applied uniformly to the five PV buses of the feeder. The profiles span conditions from high-yield clear-sky days with a sharp solar-noon peak to heavily intermittent days with rapid mid-day drop-outs. Thus, renewable availability forms a distinct component of the task context. At dispatch time, each curve is scaled by the installed PV capacity, aggregating to $3.8$~MW across the five PV buses. Because $\rho(m)=m\bmod 10$, each profile is exercised exactly twice across the benchmark. Each recurrence is paired with a different $(d,\tau)$ combination, preserving task distinctness.
+
+\subsection{Test Systems}
+\label{app:systems}
+
+\subsubsection{Distribution Feeder}
+\label{app:pdn_system}
+
+The distribution side is a modified IEEE 33-bus feeder with thirty-two branches, voltage bounds $[0.9,1.1]$~p.u., and a slack bus at node~$0$. Non-EV loads are grouped into four priority classes. The relative value-of-lost-load (VoLL) weights are $(2,3,4,5)$. Time-invariant portions $(0.87, 0.71, 0.84, 0.77)$ of the hourly nodal demand are assigned to the industrial, commercial, residential, and critical classes, respectively. EV charging and V2G injections enter as nodal exchanges with a penalty weight equal to twice the prevailing electricity price. Within the restoration window, the energy price used by the optimal-power-flow objective is held at $0.38$~USD/kWh. This removes intra-horizon price variation and isolates the effect of the four varied dimensions.
+
+\subsubsection{Transportation Network and Charging Layer}
+\label{app:tn_system}
+
+The transportation side is a twelve-node network with forty directed links and eight commuting OD pairs. Ten charging stations co-locate with selected transportation nodes. There are four slow chargers at nodes $\{1,2,3,7\}$ and nine fast chargers at $\{2,3,4,5,6,7,8,9,11\}$. Three nodes host both a slow and a fast charger. The two layers couple through a fixed charger-to-bus map. As a result, the ETAP-UE equilibrium determines the time-varying nodal injections seen by the PDN. Each EV cohort enters the horizon with an OD-pair-specific initial SoC in $[0.30, 0.45]$, averaging $0.33$ across the eight pairs. This models a post-disaster vehicle population that has not recently had the opportunity to recharge.
+
+\subsection{Offline Data and Reproducibility}
+\label{app:data_reproducibility}
+
+\subsubsection{Offline Corpus and OOD Context Sampling}
+\label{app:data}
+
+The offline corpus contains one behavior-policy trajectory collection per task. For each $m\in\mathcal{M}$, a Soft Actor--Critic behavior policy is trained online against the corresponding environment, and its rollouts are stored. The collection seed is fixed. Meta-training uses only the IID subset $\mathcal{M}_{\text{IID}}$. Three independent meta-training seeds are layered on top of this shared corpus. The encoder receives a single trajectory per IID task drawn from that task's own behavior policy.
+
+OOD evaluation additionally introduces a behavior-policy distribution shift. Rather than replaying stored trajectories for the held-out tasks, the evaluation driver performs a fresh rollout in each OOD environment. The behavior policy is drawn from a candidate pool composed exclusively of IID-trained SAC checkpoints. Replaying stored trajectories would leak the target-task action distribution through the context. The adopted protocol instead requires the encoder to infer task context from action distributions it has not observed at meta-training time. This protocol is used to evaluate both task-level and behavior-policy-level generalization. The OOD return reported in Section~V-B of the main paper is obtained under this protocol.
+
+\subsubsection{Summary of Released Parameters}
+\label{app:reproducibility}
+
+Table~\ref{tab:app_benchmark_summary} lists the fixed parameters of the test systems and the disruption-sampling distributions, together with their derived properties. Together with the encodings in~\eqref{eq:app_task_mapping} and~\eqref{eq:app_disruption_generator}, these parameters fully define the twenty tasks. The auxiliary data files are released alongside the paper\footref{fn:repo}.
+
+\begin{table}[!h]
+\centering
+\caption{Fixed parameters of the twenty-task benchmark.}
+\label{tab:app_benchmark_summary}
+\setlength{\tabcolsep}{4pt}
+\footnotesize
+\begin{tabular}{@{}cc@{}}
+\toprule
+Parameter & Value \\
+\midrule
+Restoration horizon $\lvert\mathcal{T}\rvert$ & $12$ (hourly steps) \\
+Voltage limits & $[0.9,1.1]$~p.u.\ \\
+PV installed capacity (aggregate) & $3.8$~MW \\
+VoLL weights (ind./com./res./crit.) & $2:3:4:5$ \\
+EV-cut penalty relative to spot price & $2\times$ \\
+Electricity price over the horizon & $0.38$~USD/kWh \\
+Disruption hour window & $\{3,\dots,10\}$ \\
+Damage ratio / residual-capacity range & $[0.2,0.4]$ \\
+SAC data-collection seed & $10$ \\
+Meta-training seeds & $\{110,210,310\}$ \\
+\bottomrule
+\end{tabular}
+\end{table}
